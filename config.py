@@ -8,6 +8,5 @@ class Config():
     JWT_SECRET_KEY = os.getenv("JWT_SECRET")
     EMAIL = os.getenv("EMAIL")
     PASSWORD = os.getenv("PASSWORD")
-    if os.getenv("ENVIRONMENT") == "development":
-        HOST = os.getenv("HOST")
+    HOST = os.getenv("HOST")
 
