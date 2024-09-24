@@ -41,7 +41,7 @@ def register():
     if result.acknowledged:
         token = create_access_token(identity=email, expires_delta=timedelta(hours=24))
         
-        verification_link = f"http://localhost:5000/verify_email/{token}"
+        verification_link = f"{Config.HOST}/{token}"
         mail = Mail()
         mail.send_verification_email(email, verification_link)
         mail.close()
