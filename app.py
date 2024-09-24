@@ -116,6 +116,8 @@ def perfil():
 
     if usuario:
         usuario["_id"] = str(usuario["_id"])
+        usuario.pop("password", None)
+        usuario.pop("user_type", None)
         return jsonify({"msg":"Usuario encontrado", "Usuario":usuario}), 200
     else:
         return jsonify({"msg":"Usuario no encontrado"}), 404
