@@ -41,12 +41,11 @@ def register():
     
     if result.acknowledged:
         token = create_access_token(identity=email, expires_delta=timedelta(hours=24))
-
-        try:
         
-            verification_link = f"{Config.HOST}/{token}"
+        try:
+            
             mail = Mail()
-            mail.send_verification_email(email, verification_link)
+            mail.send_verification_email(email, token)
             mail.close()
 
             response = jsonify({"msg": "Por favor verifica tu correo para completar el registro"}),200
@@ -204,5 +203,5 @@ def canjear_cupon():
 
     return jsonify({"msg": "Cupón canjeado exitosamente", "nuevos_puntos": nuevos_puntos}), 200
 
-#if __name__ == '__main__':
- #   app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
