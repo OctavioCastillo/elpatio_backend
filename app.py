@@ -194,7 +194,7 @@ def canjear_cupon():
     mongo.db.users.update_one({"_id": current_user}, {"$set": {"puntos": nuevos_puntos}})
 
     # Agrega el canje a la colección 'cupones_canjeados'
-    mongo.db.cupones_canjeados.insert_one({
+    mongo.db.cupones_canjeados.insert_one({ 
         "user_id": current_user,
         "username": usuario['username'],
         "email": usuario['email'],
