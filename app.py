@@ -37,17 +37,24 @@ def register():
         "type": "user"
     }
     result = mongo.db.temp_users.insert_one(temp_user)
+
     
     if result.acknowledged:
         token = create_access_token(identity=email, expires_delta=timedelta(hours=24))
-        
-        verification_link = f"{Config.HOST}/{token}"
-        mail = Mail()
-        mail.send_verification_email(email, verification_link)
-        mail.close()
-        
 
-        return jsonify({"msg": "Por favor verifica tu correo para completar el registro"}), 200
+        try:
+        
+            verification_link = f"{Config.HOST}/{token}"
+            mail = Mail()
+            mail.send_verification_email(email, verification_link)
+            mail.close()
+
+            response = jsonify({"msg": "Por favor verifica tu correo para completar el registro"}),200
+        except Exception as e:
+            response = jsonify({"msg": f"Error al enviar email: {e}"}),400
+        
+        finally:
+            return response
     else:
         return jsonify({"msg": "Error al crear usuario temporal"}), 401
 
