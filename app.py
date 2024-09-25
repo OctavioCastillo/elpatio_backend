@@ -43,7 +43,6 @@ def register():
         token = create_access_token(identity=email, expires_delta=timedelta(hours=24))
         
         try:
-            
             mail = Mail()
             mail.send_verification_email(email, token)
             mail.close()
