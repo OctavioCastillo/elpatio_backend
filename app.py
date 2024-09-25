@@ -37,7 +37,7 @@ def register():
         "type": "user"
     }
     result = mongo.db.temp_users.insert_one(temp_user)
-
+    
     if result.acknowledged:
         token = create_access_token(identity=email, expires_delta=timedelta(hours=24))
         
@@ -45,8 +45,7 @@ def register():
         mail = Mail()
         mail.send_verification_email(email, verification_link)
         mail.close()
-        print(token)
-        print(decode_token(token))
+        
 
         return jsonify({"msg": "Por favor verifica tu correo para completar el registro"}), 200
     else:
@@ -139,8 +138,6 @@ def agregar_puntos():
     puntos_actuales = int(usuario['puntos'])
     puntos_nuevos = puntos_actuales + puntos_añadidos
 
-    print(current_user)
-
     mongo.db.users.update_one({"_id": current_user}, {"$set": {"puntos": str(puntos_nuevos)}})
 
     return jsonify({"msg": "Puntos actualizados", "nuevos_puntos": puntos_nuevos}), 200
@@ -200,5 +197,5 @@ def canjear_cupon():
 
     return jsonify({"msg": "Cupón canjeado exitosamente", "nuevos_puntos": nuevos_puntos}), 200
 
-if __name__ == '__main__':
-    app.run(debug=True)
+#if __name__ == '__main__':
+ #   app.run(debug=True)
