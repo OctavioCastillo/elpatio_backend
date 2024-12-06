@@ -10,6 +10,9 @@ flask-bcrypt = "*"
 pymongo = {extras = ["srv"], version = "*"}
 python-dotenv = "*"
 flask-pymongo = "*"
+PyJWT = "==2.7.0"
+bson = "*"
+
 
 [dev-packages]
 

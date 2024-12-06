@@ -23,77 +23,30 @@ def register():
     email = data.get('email')
     password = data.get('password')
 
-    if mongo.db.users.find_one({'email':email}):
-        return jsonify({"msg":"Este correo ya está registrado"}), 401
-    
+    # Verificar si el correo ya está registrado
+    if mongo.db.users.find_one({'email': email}):
+        return jsonify({"msg": "Este correo ya está registrado"}), 400
+
+    # Hashear la contraseña
     hashed_pwd = bcrypt.generate_password_hash(password).decode('utf-8')
     
-    temp_user = {
+    # Crear un nuevo documento para el usuario
+    user = {
         "username": username.title(),
         "email": email,
         "password": hashed_pwd,
-        "puntos": "0",
-        "is_verified": False,
+        "puntos": "0",  # Valor inicial de puntos
+        "is_verified": True,  # Para evitar verificación por correo, asumimos como verificado
         "type": "user"
     }
-    result = mongo.db.temp_users.insert_one(temp_user)
-
+    
+    # Insertar el usuario en la colección de 'users'
+    result = mongo.db.users.insert_one(user)
     
     if result.acknowledged:
-        token = create_access_token(identity=email, expires_delta=timedelta(hours=24))
-        
-        try:
-            mail = Mail()
-            mail.send_verification_email(email, token)
-            mail.close()
-
-            response = jsonify({"msg": "Por favor verifica tu correo para completar el registro"}),200
-        except Exception as e:
-            response = jsonify({"msg": f"Error al enviar email: {e}"}),400
-        
-        finally:
-            return response
+        return jsonify({"msg": "Usuario registrado exitosamente"}), 201
     else:
-        return jsonify({"msg": "Error al crear usuario temporal"}), 401
-
-@app.route('/verify_email/<token>', methods=['GET'])
-def verify_email(token):
-    
-    try:
-
-        data = decode_token(token)
-        email = data['sub']
-
-        temp_user = mongo.db.temp_users.find_one({"email": email})
-
-        if mongo.db.users.find_one({'email':email}):
-            return jsonify({"msg":"Este correo ya está registrado"}), 401
-        
-        if not temp_user:
-            return jsonify({"msg": "No se encontró usuario temporal"}), 404
-        
-        
-        mongo.db.users.insert_one({
-            "username": temp_user['username'],
-            "email": temp_user['email'],
-            "password": temp_user['password'],
-            "puntos": temp_user['puntos'],
-            "user_type": "user"
-        })
-
-        mongo.db.temp_users.delete_many({"email": email})
-
-        return jsonify({"msg": "Usuario verificado y registrado"}), 200
-    
-    except ExpiredSignatureError:
-        return jsonify({"msg": "El token ha expirado"}), 400
-    except InvalidTokenError:
-        return jsonify({"msg": "Token inválido"}), 400
-    except DecodeError:
-        return jsonify({"msg": "Error al decodificar el token"}), 400
-    except Exception as e:
-        return jsonify({"msg": str(e)}), 500
-
+        return jsonify({"msg": "Error al registrar el usuario"}), 500
     
 @app.route('/login', methods=['POST'])
 def login():
